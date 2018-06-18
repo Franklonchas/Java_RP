@@ -50,4 +50,19 @@ public class Controlador {
         }
         return resultado;
     }
+
+    public ResultSet obtenerDatos(String nombreConductor, String fechaInicial, String fechaFinal) {
+        String sentenciaSQL = "SELECT * FROM camiones, conductores, portes WHERE camiones.matricula=portes.matricula AND conductores.nif=portes.nif AND conductores.nombre='" + nombreConductor + "' AND portes.fecha BETWEEN '" + fechaInicial + "' AND '" + fechaFinal + "'";
+        System.out.println(sentenciaSQL);
+
+        try {
+            sentencia = conexion.createStatement();
+            resultado = sentencia.executeQuery(sentenciaSQL);
+
+        } catch (SQLException e) {
+            System.err.println("No se ha podido obtener matricula, marca y modelo");
+            return null;
+        }
+        return resultado;
+    }
 }

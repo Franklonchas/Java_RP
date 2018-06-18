@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableModel;
 public class GUI extends javax.swing.JFrame {
 
     Controlador control;
-    String nombreSeleccionado;
+    String nombreSeleccionado, nombreConductor, fechaInicial, fechaFinal, matricula, marca, modeloV, km, fecha;
     DefaultTableModel modelo;
 
     public GUI() {
@@ -21,10 +21,11 @@ public class GUI extends javax.swing.JFrame {
 
     public void generarTabla() {
         modelo = new DefaultTableModel();
-        modelo.addColumn("Equpo Local");
-        modelo.addColumn("Canastas 1");
-        modelo.addColumn("Canastas 2");
-        modelo.addColumn("Canastas 3");
+        modelo.addColumn("Matricula");
+        modelo.addColumn("Marca");
+        modelo.addColumn("Modelo");
+        modelo.addColumn("Kilometros");
+        modelo.addColumn("Fecha");
         tabla.setModel(modelo);
     }
 
@@ -37,10 +38,10 @@ public class GUI extends javax.swing.JFrame {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Fallo al rellenar el choice CONDUCTORES");
+            System.err.println("Fallo al rellenar el choice CONDUCTORES.");
         }
     }
-    
+
     public void rellenarDatos() {
         nombreSeleccionado = choice.getSelectedItem();
         ResultSet res = control.obtenerDatosConductor(nombreSeleccionado);
@@ -52,7 +53,31 @@ public class GUI extends javax.swing.JFrame {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Fallo al rellenar el choice CONDUCTORES");
+            System.err.println("Fallo al rellenar los datos de los conductores.");
+        }
+        nif.setEditable(false);
+        direccion.setEditable(false);
+    }
+
+    public void rellenarDatosTabla() {
+        nombreConductor = choice.getSelectedItem();
+        fechaInicial = desde.getText();
+        fechaFinal = hasta.getText();
+
+        ResultSet res = control.obtenerDatos(nombreConductor, fechaInicial, fechaFinal);
+        try {
+            if (res != null) {
+                while (res.next()) {
+                    matricula = res.getString("matricula");
+                    marca = res.getString("marca");
+                    modeloV = res.getString("modelo");
+                    km = res.getInt("km") + "";
+                    fecha = res.getString("fecha");
+                    modelo.addRow(new Object[]{matricula, marca, modeloV, km, fecha});
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Fallo al rellenar los datos de la tabla.");
         }
         nif.setEditable(false);
         direccion.setEditable(false);
@@ -146,8 +171,18 @@ public class GUI extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tabla);
 
         consultar.setText("Consultar");
+        consultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                consultarActionPerformed(evt);
+            }
+        });
 
         salir.setText("Salir");
+        salir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                salirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -212,6 +247,14 @@ public class GUI extends javax.swing.JFrame {
     private void choiceItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_choiceItemStateChanged
         rellenarDatos();
     }//GEN-LAST:event_choiceItemStateChanged
+
+    private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_salirActionPerformed
+
+    private void consultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consultarActionPerformed
+        rellenarDatosTabla();
+    }//GEN-LAST:event_consultarActionPerformed
 
     /**
      * @param args the command line arguments
